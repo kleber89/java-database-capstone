@@ -1,17 +1,15 @@
 package com.project.back_end.models;
 
-import javax.persistence.*;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotNull;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Transient;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Appointment {
@@ -65,7 +63,7 @@ public class Appointment {
   // future when the appointment is created.
   // - It uses LocalDateTime, which includes both the date and time for the
   // appointment.
-  @jakarta.validation.constraints.Future
+  @Future
   private LocalDateTime appointmentTime;
 
   // 5. 'status' field:
@@ -78,15 +76,10 @@ public class Appointment {
   @NotNull
   private int status; // 0 - scheduled, 1 - completed
 
-  // 6. 'getEndTime' method:
-  // - Type: private LocalDateTime
-  // - Description:
-  // - This method is a transient field (not persisted in the database).
-  // - It calculates the end time of the appointment by adding one hour to the
-  // start time (appointmentTime).
-  // - It is used to get an estimated appointment end time for display purposes.
-  @Transient
-  private void Appoiment(Doctor doctor, Patient patient, LocalDateTime appointmentTime, int status) {
+  // 6. Convenience constructor (without ID):
+  // - Initializes an Appointment with doctor, patient, appointmentTime and
+  // status.
+  public Appointment(Doctor doctor, Patient patient, LocalDateTime appointmentTime, int status) {
     this.doctor = doctor;
     this.patient = patient;
     this.appointmentTime = appointmentTime;
@@ -94,22 +87,22 @@ public class Appointment {
   }
 
   // 7. 'getAppointmentDate' method:
-  // - Type: private LocalDate
+  // - Type: public LocalDate
   // - Description:
   // - This method extracts only the date part from the appointmentTime field.
   // - It returns a LocalDate object representing just the date (without the time)
   // of the scheduled appointment.
-  private LocalDate getAppointmentDate() {
+  public LocalDate getAppointmentDate() {
     return appointmentTime.toLocalDate();
   }
 
   // 8. 'getAppointmentTimeOnly' method:
-  // - Type: private LocalTime
+  // - Type: public LocalTime
   // - Description:
   // - This method extracts only the time part from the appointmentTime field.
   // - It returns a LocalTime object representing just the time (without the date)
   // of the scheduled appointment.
-  private java.time.LocalTime getAppointmentTimeOnly() {
+  public java.time.LocalTime getAppointmentTimeOnly() {
     return appointmentTime.toLocalTime();
   }
 
