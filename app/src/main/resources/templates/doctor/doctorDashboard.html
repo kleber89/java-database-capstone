@@ -1,40 +1,51 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/png" th:href="@{/assets/images/logo/logo.png}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctor Dashboard</title>
+    <link rel="icon" type="image/png" th:href="@{/assets/images/logo/logo.png}" />
     <link rel="stylesheet" th:href="@{/assets/css/adminDashboard.css}">
     <link rel="stylesheet" th:href="@{/assets/css/doctorDashboard.css}">
     <link rel="stylesheet" th:href="@{/assets/css/style.css}">
     <script th:src="@{/js/render.js}" defer></script>
     <script th:src="@{/js/util.js}" defer></script>
-    <script th:src="@{/js/header.js}" defer></script>
-    <script th:src="@{/js/footer.js}" defer></script>
+    <script th:src="@{/js/components/header.js}" defer></script>
+    <script th:src="@{/js/components/footer.js}" defer></script>
+    <script th:src="@{/js/components/patientRows.js}" defer></script>
+    <script th:src="@{/js/services/patientServices.js}" defer></script>
+    <script th:src="@{/js/doctorDashboard.js}" defer></script>
 </head>
-<body onload="renderContent()">
+<body>
     <div class="container">
         <div class="wrapper">
             <div id="header"></div>
-            <div class="main-content">
-                <h2>My Appointments</h2>
-                <div class="filters">
-                    <input type="text" id="searchBar" placeholder="Search by patient name...">
-                    <input type="date" id="datePicker">
-                    <button id="todayButton">Today</button>
+            <main class="main-content">
+                <h2>Patient Records</h2>
+                <div class="dashboard-controls">
+                    <input type="text" id="searchBar" placeholder="Search patients..." />
+                    <div class="filter-section">
+                        <button id="todayAppointmentsBtn" class="button">Today's Appointments</button>
+                        <input type="date" id="datePicker" />
+                    </div>
                 </div>
-                <table id="appointmentsTable">
-                    <thead>
-                        <tr>
-                            <th>Patient Name</th>
-                            <th>Date & Time</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="appointmentsTableBody"></tbody>
-                </table>
-            </div>
+                <div class="table-container">
+                    <table id="patientTable">
+                        <thead>
+                            <tr>
+                                <th>Patient ID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Prescription</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientTableBody">
+                            <!-- Patient records will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </main>
             <div id="footer"></div>
         </div>
     </div>
@@ -42,12 +53,10 @@
     <!-- Modal for viewing prescriptions -->
     <div id="prescriptionModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="close" onclick="closeModal('prescriptionModal')">&times;</span>
             <h2>Patient Prescriptions</h2>
             <div id="prescriptionContent"></div>
         </div>
     </div>
-
-    <script type="module" th:src="@{/js/doctorDashboard.js}" defer></script>
 </body>
 </html>

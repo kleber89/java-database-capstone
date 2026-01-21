@@ -1,106 +1,373 @@
-/* Modal styles */
+/* Reset & Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* Layout */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-image: url('../images/doctor-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.main-content {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+}
+
+.main-content h2 {
+  color: #015c5d;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Dashboard Controls */
+.dashboard-controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 900px;
+}
+
+#searchBar {
+  padding: 12px 18px;
+  border: 2px solid #ddd;
+  border-radius: 25px;
+  font-size: 16px;
+  width: 300px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+#searchBar:focus {
+  border-color: #015c5d;
+  box-shadow: 0 0 8px rgba(1, 92, 93, 0.3);
+}
+
+.filter-section {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+#todayAppointmentsBtn, #datePicker {
+  padding: 12px 20px;
+  border: 2px solid #015c5d;
+  border-radius: 25px;
+  font-size: 16px;
+  background: white;
+  color: #015c5d;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+#todayAppointmentsBtn:hover {
+  background-color: #015c5d;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(1, 92, 93, 0.3);
+}
+
+#datePicker:hover {
+  border-color: #017d7e;
+  box-shadow: 0 0 8px rgba(1, 125, 126, 0.3);
+}
+
+#datePicker:focus {
+  outline: none;
+  border-color: #015c5d;
+}
+
+/* Table Container */
+.table-container {
+  width: 100%;
+  max-width: 1200px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Table Styling */
+#patientTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+}
+
+#patientTable thead {
+  background: linear-gradient(135deg, #015c5d 0%, #017d7e 100%);
+  color: white;
+}
+
+#patientTable th {
+  padding: 18px 20px;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+#patientTable td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+#patientTable tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+#patientTable tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+#patientTable tbody tr:hover {
+  background-color: #e3f2fd;
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#patientTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Prescription Button */
+.prescription-btn {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.prescription-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+.prescription-btn:active {
+  transform: scale(0.95);
+}
+
+/* No Records Message */
+.noPatientRecord {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-style: italic;
+  font-size: 18px;
+}
+
+.noPatientRecord::before {
+  content: "📋";
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* Modal Styles */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 600px;
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 30px;
+  border: 1px solid #888;
+  width: 90%;
+  max-width: 700px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-content h2 {
+  color: #015c5d;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
 }
 
 .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+  color: #aaa;
+  float: right;
+  font-size: 32px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  margin-top: -10px;
 }
 
 .close:hover,
 .close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+  color: #000;
 }
 
-/* Filters */
-.filters {
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 30px 20px;
+  }
+
+  .dashboard-controls {
+    padding: 20px;
+    max-width: 100%;
+  }
+
+  #searchBar {
+    width: 250px;
+  }
+
+  .table-container {
+    max-width: 100%;
+  }
 }
 
-#searchBar {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    flex: 1;
-}
+@media (max-width: 768px) {
+  .main-content {
+    padding: 20px 15px;
+    gap: 20px;
+  }
 
-#datePicker {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
+  .main-content h2 {
+    font-size: 2rem;
+  }
 
-#todayButton {
-    padding: 8px 16px;
-    background-color: #015c5d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
+  .dashboard-controls {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
 
-/* Table */
-#appointmentsTable {
+  #searchBar {
     width: 100%;
-    border-collapse: collapse;
-    font-family: Arial, sans-serif;
-    margin-top: 20px;
-}
+    max-width: 300px;
+  }
 
-#appointmentsTable th, #appointmentsTable td {
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
+  .filter-section {
+    width: 100%;
+    justify-content: center;
+  }
 
-#appointmentsTable th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
+  #patientTable {
+    font-size: 14px;
+  }
 
-#appointmentsTable tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
+  #patientTable th,
+  #patientTable td {
+    padding: 12px 10px;
+  }
 
-#appointmentsTable tr:hover {
-    background-color: #f1f1f1;
-}
-
-.view-prescriptions-btn {
+  .prescription-btn {
     padding: 6px 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .modal-content {
+    margin: 10% auto;
+    padding: 20px;
+    width: 95%;
+  }
 }
 
-.view-prescriptions-btn:hover {
-    background-color: #0056b3;
+@media (max-width: 480px) {
+  .main-content h2 {
+    font-size: 1.8rem;
+  }
+
+  .dashboard-controls {
+    padding: 12px;
+  }
+
+  #searchBar {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  #todayAppointmentsBtn, #datePicker {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  #patientTable {
+    font-size: 12px;
+  }
+
+  #patientTable th,
+  #patientTable td {
+    padding: 8px 6px;
+  }
+
+  .prescription-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .noPatientRecord {
+    padding: 20px;
+    font-size: 16px;
+  }
 }

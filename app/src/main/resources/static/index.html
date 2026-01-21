@@ -1,104 +1,109 @@
-<!-- index.html -->
-<!-- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Role</title>
+    <link rel="icon" type="image/png" href="assets/images/logo/logo.png" />
+    <link rel="stylesheet" href="assets/css/index.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="js/util.js" defer></script>
+    <script src="js/render.js" defer></script>
+    <script src="js/components/header.js" defer></script>
+    <script src="js/components/footer.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="wrapper">
+            <div id="header"></div>
+            <main class="main-content">
+                <h2>Select Your Role</h2>
+                <p>Please choose your role in the Clinic Management System:</p>
+                <div class="role-buttons">
+                    <button id="adminBtn" class="role-btn admin-btn" onclick="selectRoleType('admin')">
+                        <h3>Admin</h3>
+                        <p>Manage doctors, patients, and system settings</p>
+                    </button>
+                    <button id="doctorBtn" class="role-btn doctor-btn" onclick="selectRoleType('doctor')">
+                        <h3>Doctor</h3>
+                        <p>View appointments and manage patient records</p>
+                    </button>
+                    <button id="patientBtn" class="role-btn patient-btn" onclick="selectRoleType('patient')">
+                        <h3>Patient</h3>
+                        <p>Book appointments and view medical records</p>
+                    </button>
+                </div>
+            </main>
+            <div id="footer"></div>
+        </div>
+    </div>
 
-Step-by-Step Explanation of `index.html`.
-This file allows users to select a role (Admin, Patient, Doctor) 
-and triggers modal-based login functionality.
+    <!-- Modal for login -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
 
-1. Label the File
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('adminLoginModal')">&times;</span>
+            <h2>Admin Login</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminUsername">Username:</label>
+                    <input type="text" id="adminUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Password:</label>
+                    <input type="password" id="adminPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
 
-   * Add a comment at the very top to identify the file as `index.html`. This helps developers stay organized.
+    <!-- Doctor Login Modal -->
+    <div id="doctorLoginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('doctorLoginModal')">&times;</span>
+            <h2>Doctor Login</h2>
+            <form id="doctorLoginForm">
+                <div class="form-group">
+                    <label for="doctorUsername">Username:</label>
+                    <input type="text" id="doctorUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="doctorPassword">Password:</label>
+                    <input type="password" id="doctorPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
 
-2. Declare Document Type
+    <!-- Patient Login Modal -->
+    <div id="patientLoginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('patientLoginModal')">&times;</span>
+            <h2>Patient Login</h2>
+            <form id="patientLoginForm">
+                <div class="form-group">
+                    <label for="patientUsername">Username:</label>
+                    <input type="text" id="patientUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="patientPassword">Password:</label>
+                    <input type="password" id="patientPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
 
-   * Use the declaration for HTML5 so browsers know how to render the page correctly.
-
-3. Start the HTML Document
-
-   * Begin the HTML structure and set the document language to English to improve accessibility and SEO `lang="en"`.
-
-4. Head Section (Metadata and Resources)
-
-   * Open the `<head>` section which contains settings and links that don’t show up visually.
-
-5. Set Character Encoding
-
-   * Specify UTF-8 encoding to support most global characters and symbols.
-
-6. Set the Page Title
-
-   * Give the page a name (e.g., "Select Role") that appears on the browser tab.
-
-7. Add a Favicon
-
-   * Link to an icon (like a logo) that will appear in the browser tab from the address `href="../assets/images/logo/Logo.png"`
-
-8. Link Stylesheets
-
-   * Add a page-specific stylesheet for layout and design.
-   * Also include a global stylesheet for shared site-wide styles.
-
-   HINT:
-      `<link rel="stylesheet" href="../assets/css/index.css">`
-      `<link rel="stylesheet" href="../assets/css/style.css">`
-
-9. Add JavaScript Files with `defer`
-
-   * Link utility and rendering JavaScript files (e.g., `util.js`, `render.js`).
-   * Include scripts for rendering components like header and footer.
-   * Use the `defer` attribute so they load after the HTML is parsed.
-
-   HINT:
-      `<script src="../js/util.js" defer></script>`
-      `<script src="../js/render.js" defer></script>`
-      `<script src="../js/components/header.js" defer></script>`
-      `<script src="../js/components/footer.js" defer></script>`
-      
-10. Close the Head and Open the Body
-
-    * Wrap up metadata and begin the visible page content.
-
-11. Create a Container
-
-    * Add a main container to hold all page elements and apply layout constraints.
-
-12. Use a Wrapper for Structure
-
-    * Inside the container, add a wrapper to group header, main, and footer sections logically.
-
-13. Insert a Header Placeholder
-
-    * Add a `div` that will be dynamically filled by JavaScript with the site’s header.
-
-14. Define the Main Section
-
-    * Use a semantic `<main>` tag to hold the central content of the page.
-
-15. Add a Heading for Role Selection
-
-    * Display a heading like “Select Your Role” to instruct users.
-
-16. Add Buttons for Roles
-
-    * Create buttons for each role: Admin, Patient, and Doctor.
-    * Assign unique identifiers or `onclick` handlers to them as needed.
-
-17. Insert a Footer Placeholder
-
-    * Add a `div` that will be dynamically filled by JavaScript with the site’s footer.
-
-18. Create a Modal Structure
-
-    * Add a modal overlay for popups (like login forms).
-    * Include a close button and an inner container for dynamic content.
-
-19. Load Page-Specific Logic Module
-
-    * Use a `<script type="module">` tag to load the role selection logic (e.g., `index.js`).
-    * Ensure it’s deferred so it doesn’t block HTML rendering.
-
-20. Close the Body and HTML Tags
-
-    * Properly close all opened tags to complete the document structure.
-
- -->
+    <script type="module" src="js/services/index.js" defer></script>
+    <script type="module" src="js/components/modals.js" defer></script>
+    <script src="js/index.js" defer></script>
+</body>
+</html>
