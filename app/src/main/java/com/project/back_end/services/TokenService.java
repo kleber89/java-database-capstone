@@ -15,65 +15,62 @@ import com.project.back_end.repo.PatientRepository;
 @Component
 public class TokenService {
 
-    @Autowired
-    private AdminRepository adminRepository;
+    private final AdminRepository adminRepository;
+    private final DoctorRepository doctorRepository;
+    private final PatientRepository patientRepository;
+
+    private final String jwtSecret = "your-secret-key"; // Should be stored in application.properties
 
     @Autowired
-    private DoctorRepository doctorRepository;
+    public TokenService(AdminRepository adminRepository, DoctorRepository doctorRepository,
+            PatientRepository patientRepository) {
+        this.adminRepository = adminRepository;
+        this.doctorRepository = doctorRepository;
+        this.patientRepository = patientRepository;
+    }
 
-    @Autowired
-    private PatientRepository patientRepository;
-
-    private String jwtSecret = "your-secret-key"; // Should be from properties
-
+    // Method to retrieve the signing key used for JWT token signing
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    public String generateToken(String email) {
+    // Method to generate a JWT token for a given user's identifier
+    public String generateToken(String identifier) {
         return Jwts.builder()
-                .subject(email)
+                .subject(identifier)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000)) // 7 days
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public String extractSubject(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
+    // Method to extract the identifier (subject) from a JWT token
+    public String extractIdentifier(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
                 .build()
-                .parseSignedClaims(token)
-                .getPayload()
+                .parseClaimsJws(token)
+                .getBody()
                 .getSubject();
     }
 
-    public Map<String, Object> validateToken(String token, String role) {
-        Map<String, Object> result = new HashMap<>();
+    // Method to validate the JWT token for a given user type (admin, doctor, or
+    // patient)
+    public boolean validateToken(String token, String role) {
         try {
-            String subject = extractSubject(token);
+            String identifier = extractIdentifier(token);
             switch (role) {
                 case "admin":
-                    if (adminRepository.findByUsername(subject) == null) {
-                        result.put("error", "Invalid admin token");
-                    }
-                    break;
+                    return adminRepository.findByUsername(identifier) != null;
                 case "doctor":
-                    if (doctorRepository.findByEmail(subject) == null) {
-                        result.put("error", "Invalid doctor token");
-                    }
-                    break;
+                    return doctorRepository.findByEmail(identifier) != null;
                 case "patient":
-                    if (patientRepository.findByEmail(subject) == null) {
-                        result.put("error", "Invalid patient token");
-                    }
-                    break;
+                    return patientRepository.findByEmail(identifier) != null;
                 default:
-                    result.put("error", "Invalid role");
+                    return false; // Invalid role
             }
         } catch (Exception e) {
-            result.put("error", "Invalid token");
+            return false; // Token is invalid or expired
         }
-        return result; // Empty if valid, has error if invalid
     }
 }
