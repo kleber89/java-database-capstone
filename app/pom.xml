@@ -39,8 +39,9 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
+            <groupId>mysql</groupId> <!-- Corregido -->
+            <artifactId>mysql-connector-java</artifactId> <!-- Cambiado a mysql-connector-java -->
+            <version>8.0.32</version> <!-- Añadida la versión -->
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -62,18 +63,19 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
             <version>0.12.6</version>
+            <scope>compile</scope> <!-- Añadido scope -->
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
             <version>0.12.6</version>
-            <scope>runtime</scope>
+            <scope>compile</scope> <!-- Añadido scope -->
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <version>0.12.6</version>
-            <scope>runtime</scope>
+            <scope>compile</scope> <!-- Añadido scope -->
         </dependency>
     </dependencies>
 
