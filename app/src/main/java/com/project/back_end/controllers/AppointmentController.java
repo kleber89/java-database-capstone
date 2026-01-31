@@ -7,6 +7,7 @@ import com.project.back_end.services.AppointmentService; // Assuming this servic
 import com.project.back_end.services.UserService; // Assuming this service handles validation logic
 import com.project.back_end.models.Appointment; // Assuming Appointment is a model class representing an appointment
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -26,17 +27,19 @@ public class AppointmentController {
 
     // Method to get appointments based on date and patient name
     @GetMapping("/{date}/{patientName}/{token}")
-    public ResponseEntity<List<Appointment>> getAppointments(@PathVariable String date,
+    public ResponseEntity<Map<String, Object>> getAppointments(@PathVariable String date,
             @PathVariable String patientName,
             @PathVariable String token) {
         // Validate the token for role "doctor"
-        if (!userService.validateToken(token, "doctor")) {
-            return ResponseEntity.status(401).body(null); // Unauthorized
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "doctor");
+        if (tokenValidation.getStatusCode().value() != 200) {
+            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized")); // Unauthorized
         }
 
         // Fetch appointments for the given patient on the specified date
-        List<Appointment> appointments = appointmentService.getAppointments(date, patientName);
-        return ResponseEntity.ok(appointments); // Return appointments
+        LocalDate localDate = LocalDate.parse(date);
+        Map<String, Object> result = appointmentService.getAppointment(patientName, localDate, token);
+        return ResponseEntity.ok(result); // Return appointments
     }
 
     // Method to book a new appointment
@@ -44,22 +47,25 @@ public class AppointmentController {
     public ResponseEntity<Map<String, String>> bookAppointment(@RequestBody Appointment appointment,
             @PathVariable String token) {
         // Validate the token for role "patient"
-        if (!userService.validateToken(token, "patient")) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "patient");
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized")); // Unauthorized
         }
 
         // Validate the appointment data
-        String validationMessage = userService.validateAppointment(appointment);
-        if (validationMessage != null) {
-            return ResponseEntity.badRequest().body(Map.of("error", validationMessage)); // Bad request
+        int validationResult = userService.validateAppointment(appointment);
+        if (validationResult == -1) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Doctor doesn't exist")); // Bad request
+        } else if (validationResult == 0) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Appointment slot is not available")); // Bad request
         }
 
         // Book the appointment using the service
-        boolean isBooked = appointmentService.bookAppointment(appointment);
-        if (isBooked) {
+        int result = appointmentService.bookAppointment(appointment);
+        if (result == 1) {
             return ResponseEntity.status(201).body(Map.of("message", "Appointment booked successfully")); // Created
         } else {
-            return ResponseEntity.status(400).body(Map.of("error", "Appointment slot is already taken")); // Bad request
+            return ResponseEntity.status(400).body(Map.of("error", "Failed to book appointment")); // Bad request
         }
     }
 
@@ -68,17 +74,14 @@ public class AppointmentController {
     public ResponseEntity<Map<String, String>> updateAppointment(@RequestBody Appointment appointment,
             @PathVariable String token) {
         // Validate the token for role "patient"
-        if (!userService.validateToken(token, "patient")) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "patient");
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized")); // Unauthorized
         }
 
         // Update the appointment using the service
-        boolean isUpdated = appointmentService.updateAppointment(appointment);
-        if (isUpdated) {
-            return ResponseEntity.ok(Map.of("message", "Appointment updated successfully")); // OK
-        } else {
-            return ResponseEntity.status(404).body(Map.of("error", "Appointment not found")); // Not found
-        }
+        ResponseEntity<Map<String, String>> response = appointmentService.updateAppointment(appointment);
+        return response; // Return the response from service
     }
 
     // Method to cancel a specific appointment
@@ -86,16 +89,13 @@ public class AppointmentController {
     public ResponseEntity<Map<String, String>> cancelAppointment(@PathVariable Long id,
             @PathVariable String token) {
         // Validate the token for role "patient"
-        if (!userService.validateToken(token, "patient")) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "patient");
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized")); // Unauthorized
         }
 
         // Cancel the appointment using the service
-        boolean isCancelled = appointmentService.cancelAppointment(id);
-        if (isCancelled) {
-            return ResponseEntity.ok(Map.of("message", "Appointment canceled successfully")); // OK
-        } else {
-            return ResponseEntity.status(404).body(Map.of("error", "Appointment not found")); // Not found
-        }
+        ResponseEntity<Map<String, String>> response = appointmentService.cancelAppointment(id, token);
+        return response; // Return the response from service
     }
 }

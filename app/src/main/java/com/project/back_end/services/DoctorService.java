@@ -2,7 +2,7 @@ package com.project.back_end.services;
 
 import com.project.back_end.models.Doctor;
 import com.project.back_end.models.Appointment;
-import com.project.back_end.models.Login;
+import com.project.back_end.DTO.Login;
 import com.project.back_end.repo.DoctorRepository;
 import com.project.back_end.repo.AppointmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,7 +102,7 @@ public class DoctorService {
     @Transactional(readOnly = true)
     public ResponseEntity<Map<String, String>> validateDoctor(Login login) {
         Map<String, String> response = new HashMap<>();
-        Doctor doctor = doctorRepository.findByEmail(login.getEmail());
+        Doctor doctor = doctorRepository.findByEmail(login.getIdentifier());
         if (doctor == null) {
             response.put("message", "Doctor not found.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);

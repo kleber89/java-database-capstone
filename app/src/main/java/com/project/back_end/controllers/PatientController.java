@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import com.project.back_end.services.PatientService; // Assuming this service exists
 import com.project.back_end.services.UserService; // Shared service for validation
 import com.project.back_end.models.Patient; // Assuming Patient is a model class representing a patient
-import com.project.back_end.models.Login; // Assuming Login is a DTO for login credentials
+import com.project.back_end.models.Appointment;
+import com.project.back_end.DTO.Login; // Assuming Login is a DTO for login credentials
 
 import java.util.List;
 import java.util.Map;
@@ -29,13 +30,14 @@ public class PatientController {
     @GetMapping("/{token}")
     public ResponseEntity<Map<String, Object>> getPatient(@PathVariable String token) {
         // Validate the token for the "patient" role
-        if (!userService.validateToken(token, "patient")) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "patient");
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized")); // Unauthorized
         }
 
         // Fetch patient details
-        Map<String, Object> patientDetails = patientService.getPatientDetails(token);
-        return ResponseEntity.ok(patientDetails); // Return patient details
+        ResponseEntity<Map<String, Object>> patientDetails = patientService.getPatientDetails(token);
+        return patientDetails; // Return patient details
     }
 
     // Method to create a new patient
@@ -47,10 +49,10 @@ public class PatientController {
         }
 
         // Attempt to create the patient
-        try {
-            patientService.createPatient(patient);
+        int result = patientService.createPatient(patient);
+        if (result == 1) {
             return ResponseEntity.status(201).body(Map.of("message", "Signup successful")); // Created
-        } catch (Exception e) {
+        } else {
             return ResponseEntity.status(500).body(Map.of("error", "Internal server error")); // Internal server error
         }
     }
@@ -59,15 +61,16 @@ public class PatientController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody Login login) {
         // Validate patient's login credentials
-        Map<String, String> response = userService.validatePatientLogin(login);
-        return ResponseEntity.ok(response); // Return login status and token
+        ResponseEntity<Map<String, String>> response = userService.validatePatientLogin(login);
+        return response; // Return login status and token
     }
 
     // Method to get patient appointments
     @GetMapping("/{id}/{token}")
     public ResponseEntity<List<Appointment>> getPatientAppointments(@PathVariable Long id, @PathVariable String token) {
         // Validate the token for the "patient" role
-        if (!userService.validateToken(token, "patient")) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "patient");
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(null); // Unauthorized
         }
 
@@ -82,7 +85,8 @@ public class PatientController {
             @PathVariable String name,
             @PathVariable String token) {
         // Validate the token for the "patient" role
-        if (!userService.validateToken(token, "patient")) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "patient");
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(null); // Unauthorized
         }
 

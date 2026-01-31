@@ -1,5 +1,6 @@
 package com.project.back_end.DTO;
 
+import com.project.back_end.models.Appointment;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -122,5 +123,31 @@ public class AppointmentDTO {
 
     public LocalDateTime getEndTime() {
         return endTime;
+    }
+
+    // ============ Static Factory Method ============
+
+    /**
+     * Creates an AppointmentDTO from an Appointment entity.
+     * 
+     * @param appointment The Appointment entity to convert
+     * @return A new AppointmentDTO instance with data from the Appointment
+     */
+    public static AppointmentDTO fromAppointment(Appointment appointment) {
+        if (appointment == null) {
+            return null;
+        }
+        return new AppointmentDTO(
+                appointment.getId(),
+                appointment.getDoctor() != null ? appointment.getDoctor().getId() : null,
+                appointment.getDoctor() != null ? appointment.getDoctor().getName() : null,
+                appointment.getPatient() != null ? appointment.getPatient().getId() : null,
+                appointment.getPatient() != null ? appointment.getPatient().getName() : null,
+                appointment.getPatient() != null ? appointment.getPatient().getEmail() : null,
+                appointment.getPatient() != null ? appointment.getPatient().getPhone() : null,
+                appointment.getPatient() != null ? appointment.getPatient().getAddress() : null,
+                appointment.getAppointmentTime(),
+                appointment.getStatus()
+        );
     }
 }

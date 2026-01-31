@@ -7,6 +7,8 @@ import java.util.List;
 public interface PrescriptionRepository extends MongoRepository<Prescription, String> {
 
     List<Prescription> findByAppointmentId(Long appointmentId);
+    
+    boolean existsByAppointmentId(Long appointmentId);
     // 1. Extend MongoRepository:
     // - The repository extends MongoRepository<Prescription, String>, which
     // provides basic CRUD functionality for MongoDB.

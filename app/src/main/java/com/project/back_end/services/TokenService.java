@@ -6,8 +6,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import com.project.back_end.repo.AdminRepository;
 import com.project.back_end.repo.DoctorRepository;
 import com.project.back_end.repo.PatientRepository;
@@ -46,11 +44,11 @@ public class TokenService {
 
     // Method to extract the identifier (subject) from a JWT token
     public String extractIdentifier(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
+                .parseSignedClaims(token)
+                .getPayload()
                 .getSubject();
     }
 
@@ -71,6 +69,44 @@ public class TokenService {
             }
         } catch (Exception e) {
             return false; // Token is invalid or expired
+        }
+    }
+
+    // Method to generate a JWT token for a doctor using their ID
+    public String generateDoctorToken(Long doctorId) {
+        return Jwts.builder()
+                .subject(String.valueOf(doctorId))
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000)) // 7 days
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    // Method to extract email from a JWT token (for patient tokens)
+    public String extractEmail(String token) {
+        return extractIdentifier(token);
+    }
+
+    // Method to extract patient ID from a JWT token
+    // Patient tokens store email as subject, so we need to look up the patient by email
+    public Long extractPatientId(String token) {
+        try {
+            String email = extractIdentifier(token);
+            com.project.back_end.models.Patient patient = patientRepository.findByEmail(email);
+            return patient != null ? patient.getId() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // Method to extract doctor ID from a JWT token
+    // Doctor tokens store ID as subject
+    public Long extractDoctorId(String token) {
+        try {
+            String idString = extractIdentifier(token);
+            return Long.parseLong(idString);
+        } catch (Exception e) {
+            return null;
         }
     }
 }

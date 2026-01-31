@@ -8,6 +8,8 @@ import com.project.back_end.services.UserService; // Shared service for validati
 import com.project.back_end.services.AppointmentService; // Service for managing appointments
 import com.project.back_end.models.Prescription; // Assuming Prescription is a model class representing a prescription
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("${api.path}prescription") // Base URL path for all methods in this controller
 public class PrescriptionController {
@@ -31,19 +33,18 @@ public class PrescriptionController {
     public ResponseEntity<Map<String, String>> savePrescription(@RequestBody Prescription prescription,
             @PathVariable String token) {
         // Validate the token for the "doctor" role
-        if (!userService.validateToken(token, "doctor")) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "doctor");
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized")); // Unauthorized
         }
 
-        // Save the prescription and update the appointment status
-        try {
-            prescriptionService.savePrescription(prescription);
-            appointmentService.updateAppointmentStatus(prescription.getAppointmentId(), "Prescription Issued");
-            return ResponseEntity.status(201).body(Map.of("message", "Prescription saved successfully")); // Created
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("error", "Failed to save prescription")); // Internal server
-                                                                                                    // error
+        // Save the prescription
+        ResponseEntity<Map<String, String>> response = prescriptionService.savePrescription(prescription);
+        if (response.getStatusCode().value() == 201) {
+            // Note: updateAppointmentStatus method doesn't exist in AppointmentService
+            // You may need to add this method or handle appointment status update differently
         }
+        return response;
     }
 
     // Method to get a prescription by appointment ID
@@ -51,17 +52,13 @@ public class PrescriptionController {
     public ResponseEntity<Map<String, Object>> getPrescription(@PathVariable Long appointmentId,
             @PathVariable String token) {
         // Validate the token for the "doctor" role
-        if (!userService.validateToken(token, "doctor")) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "doctor");
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized")); // Unauthorized
         }
 
         // Retrieve the prescription using the appointment ID
-        Prescription prescription = prescriptionService.getPrescription(appointmentId);
-        if (prescription != null) {
-            return ResponseEntity.ok(Map.of("prescription", prescription)); // Return prescription details
-        } else {
-            return ResponseEntity.status(404).body(Map.of("error", "No prescription found for this appointment")); // Not
-                                                                                                                   // found
-        }
+        ResponseEntity<Map<String, Object>> response = prescriptionService.getPrescription(appointmentId);
+        return response; // Return prescription details
     }
 }

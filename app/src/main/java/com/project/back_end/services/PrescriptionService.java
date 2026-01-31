@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.project.back_end.models.Prescription;
+import com.project.back_end.repo.PrescriptionRepository;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,12 +49,14 @@ public class PrescriptionService {
     public ResponseEntity<Map<String, Object>> getPrescription(Long appointmentId) {
         Map<String, Object> response = new HashMap<>();
         try {
-            Prescription prescription = prescriptionRepository.findByAppointmentId(appointmentId);
-            if (prescription == null) {
+            java.util.List<Prescription> prescriptions = prescriptionRepository.findByAppointmentId(appointmentId);
+            if (prescriptions == null || prescriptions.isEmpty()) {
                 response.put("message", "No prescription found for this appointment.");
                 return ResponseEntity.ok(response); // 200 OK
             }
 
+            // Return the first prescription if multiple exist
+            Prescription prescription = prescriptions.get(0);
             response.put("prescription", prescription);
             return ResponseEntity.ok(response); // 200 OK
         } catch (Exception e) {

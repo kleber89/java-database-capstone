@@ -6,7 +6,16 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.project.back_end.models.Admin;
+import com.project.back_end.models.Appointment;
+import com.project.back_end.models.Patient;
+import com.project.back_end.DTO.Login;
+import com.project.back_end.repo.AdminRepository;
+import com.project.back_end.repo.DoctorRepository;
+import com.project.back_end.repo.PatientRepository;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -67,16 +76,22 @@ public class UserService {
 
     // Method to filter doctors based on name, specialty, and available time
     public Map<String, Object> filterDoctor(String name, String specialty, String time) {
-        return doctorService.filterDoctorsByNameSpecialtyAndTime(name, specialty, time);
+        return doctorService.filterDoctorsByNameSpecilityandTime(name, specialty, time);
     }
 
     // Method to validate whether an appointment is available based on the doctor's
     // schedule
     public int validateAppointment(Appointment appointment) {
-        if (!doctorRepository.existsById(appointment.getDoctorId())) {
+        if (appointment == null || appointment.getDoctor() == null || 
+            !doctorRepository.existsById(appointment.getDoctor().getId())) {
             return -1; // Doctor doesn't exist
         }
-        return doctorService.getDoctorAvailability(appointment.getDoctorId(), appointment.getTime());
+        List<String> availability = doctorService.getDoctorAvailability(
+            appointment.getDoctor().getId(), 
+            appointment.getAppointmentTime().toLocalDate()
+        );
+        String timeStr = appointment.getAppointmentTime().toLocalTime().toString();
+        return availability.contains(timeStr) ? 1 : 0;
     }
 
     // Method to check whether a patient exists based on their email or phone number
@@ -88,7 +103,7 @@ public class UserService {
     public ResponseEntity<Map<String, String>> validatePatientLogin(Login login) {
         Map<String, String> response = new HashMap<>();
         try {
-            Patient patient = patientRepository.findByEmail(login.getEmail());
+            Patient patient = patientRepository.findByEmail(login.getIdentifier());
             if (patient != null && patient.getPassword().equals(login.getPassword())) {
                 String token = tokenService.generateToken(patient.getEmail());
                 response.put("token", token);

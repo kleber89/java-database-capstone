@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import com.project.back_end.services.DoctorService; // Assuming this service exists
 import com.project.back_end.services.UserService; // Shared service for validation
 import com.project.back_end.models.Doctor; // Assuming Doctor is a model class representing a doctor
-import com.project.back_end.models.Login; // Assuming Login is a DTO for login credentials
+import com.project.back_end.DTO.Login; // Assuming Login is a DTO for login credentials
 
 import java.util.List;
 import java.util.Map;
@@ -32,13 +32,15 @@ public class DoctorController {
             @PathVariable String date,
             @PathVariable String token) {
         // Validate the token
-        if (!userService.validateToken(token, user)) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, user);
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized")); // Unauthorized
         }
 
         // Fetch doctor's availability
-        Map<String, Object> availability = doctorService.getDoctorAvailability(doctorId, date);
-        return ResponseEntity.ok(availability); // Return availability status
+        java.time.LocalDate localDate = java.time.LocalDate.parse(date);
+        List<String> availability = doctorService.getDoctorAvailability(doctorId, localDate);
+        return ResponseEntity.ok(Map.of("availability", availability)); // Return availability status
     }
 
     // Method to get a list of all doctors
@@ -52,7 +54,8 @@ public class DoctorController {
     @PostMapping("/{token}")
     public ResponseEntity<Map<String, String>> saveDoctor(@RequestBody Doctor doctor, @PathVariable String token) {
         // Validate the token for admin role
-        if (!userService.validateToken(token, "admin")) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "admin");
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized")); // Unauthorized
         }
 
@@ -69,21 +72,22 @@ public class DoctorController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> doctorLogin(@RequestBody Login login) {
         // Validate doctor's credentials
-        Map<String, String> response = doctorService.validateDoctor(login);
-        return ResponseEntity.ok(response); // Return login status and token
+        ResponseEntity<Map<String, String>> response = doctorService.validateDoctor(login);
+        return response; // Return login status and token
     }
 
     // Method to update doctor details
     @PutMapping("/{token}")
     public ResponseEntity<Map<String, String>> updateDoctor(@RequestBody Doctor doctor, @PathVariable String token) {
         // Validate the token for admin role
-        if (!userService.validateToken(token, "admin")) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "admin");
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized")); // Unauthorized
         }
 
         // Attempt to update the doctor
-        boolean updated = doctorService.updateDoctor(doctor);
-        if (updated) {
+        int result = doctorService.updateDoctor(doctor);
+        if (result == 1) {
             return ResponseEntity.ok(Map.of("message", "Doctor updated")); // OK
         } else {
             return ResponseEntity.status(404).body(Map.of("error", "Doctor not found")); // Not found
@@ -94,13 +98,14 @@ public class DoctorController {
     @DeleteMapping("/{id}/{token}")
     public ResponseEntity<Map<String, String>> deleteDoctor(@PathVariable Long id, @PathVariable String token) {
         // Validate the token for admin role
-        if (!userService.validateToken(token, "admin")) {
+        ResponseEntity<Map<String, String>> tokenValidation = userService.validateToken(token, "admin");
+        if (tokenValidation.getStatusCode().value() != 200) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized")); // Unauthorized
         }
 
         // Attempt to delete the doctor
-        boolean deleted = doctorService.deleteDoctor(id);
-        if (deleted) {
+        int result = doctorService.deleteDoctor(id);
+        if (result == 1) {
             return ResponseEntity.ok(Map.of("message", "Doctor deleted successfully")); // OK
         } else {
             return ResponseEntity.status(404).body(Map.of("error", "Doctor not found with id")); // Not found
@@ -112,7 +117,9 @@ public class DoctorController {
     public ResponseEntity<List<Doctor>> filter(@PathVariable String name,
             @PathVariable String time,
             @PathVariable String speciality) {
-        List<Doctor> filteredDoctors = doctorService.filterDoctors(name, time, speciality);
-        return ResponseEntity.ok(filteredDoctors); // Return filtered list of doctors
+        Map<String, Object> result = doctorService.filterDoctorsByNameSpecilityandTime(name, speciality, time);
+        @SuppressWarnings("unchecked")
+        List<Doctor> filteredDoctors = (List<Doctor>) result.get("doctors");
+        return ResponseEntity.ok(filteredDoctors != null ? filteredDoctors : List.of()); // Return filtered list of doctors
     }
 }

@@ -2,7 +2,7 @@ package com.project.back_end.services;
 
 import com.project.back_end.models.Patient;
 import com.project.back_end.models.Appointment;
-import com.project.back_end.dto.AppointmentDTO;
+import com.project.back_end.DTO.AppointmentDTO;
 import com.project.back_end.repo.PatientRepository;
 import com.project.back_end.repo.AppointmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,9 @@ public class PatientService {
     @Transactional
     public int createPatient(Patient patient) {
         try {
+            if (patient == null) {
+                return 0;
+            }
             patientRepository.save(patient);
             return 1;
         } catch (Exception e) {
@@ -126,6 +129,80 @@ public class PatientService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
         response.put("patient", patient);
+        return ResponseEntity.ok(response);
+    }
+
+    // 7. Check if patient exists by email or phone
+    @Transactional(readOnly = true)
+    public boolean patientExists(Patient patient) {
+        if (patient == null) {
+            return false;
+        }
+        Patient existing = patientRepository.findByEmailOrPhone(patient.getEmail(), patient.getPhone());
+        return existing != null;
+    }
+
+    // 8. Get patient appointments by ID
+    @Transactional(readOnly = true)
+    public List<Appointment> getPatientAppointments(Long id) {
+        return appointmentRepository.findByPatientId(id);
+    }
+
+    // 9. Filter patient appointments by condition and doctor name
+    @Transactional(readOnly = true)
+    public List<Appointment> filterPatientAppointments(String condition, String name) {
+        // This is a simplified version - you may need to adjust based on your repository methods
+        List<Appointment> appointments = appointmentRepository.findAll();
+        return appointments.stream()
+                .filter(a -> {
+                    if (name != null && !name.isEmpty()) {
+                        if (a.getDoctor() == null || !a.getDoctor().getName().toLowerCase().contains(name.toLowerCase())) {
+                            return false;
+                        }
+                    }
+                    if (condition != null) {
+                        int status = "past".equalsIgnoreCase(condition) ? 1 : 0;
+                        return a.getStatus() == status;
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+    }
+
+    // 10. Filter by condition and doctor name using patient email
+    @Transactional(readOnly = true)
+    public ResponseEntity<Map<String, Object>> filterByConditionAndDoctor(String condition, String name, String email) {
+        Patient patient = patientRepository.findByEmail(email);
+        if (patient == null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Patient not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        
+        int status = -1;
+        if ("past".equalsIgnoreCase(condition)) {
+            status = 1;
+        } else if ("future".equalsIgnoreCase(condition)) {
+            status = 0;
+        }
+        
+        List<Appointment> appointments;
+        if (status >= 0 && name != null && !name.isEmpty()) {
+            appointments = appointmentRepository.filterByDoctorNameAndPatientIdAndStatus(name, patient.getId(), status);
+        } else if (status >= 0) {
+            appointments = appointmentRepository.findByPatient_IdAndStatusOrderByAppointmentTimeAsc(patient.getId(), status);
+        } else if (name != null && !name.isEmpty()) {
+            appointments = appointmentRepository.filterByDoctorNameAndPatientId(name, patient.getId());
+        } else {
+            appointments = appointmentRepository.findByPatientId(patient.getId());
+        }
+        
+        List<AppointmentDTO> appointmentDTOs = appointments.stream()
+                .map(AppointmentDTO::fromAppointment)
+                .collect(Collectors.toList());
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("appointments", appointmentDTOs);
         return ResponseEntity.ok(response);
     }
 }
