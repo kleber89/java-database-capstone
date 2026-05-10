@@ -70,7 +70,7 @@ function redirectToUpdatePage(appointment) {
     doctorName: appointment.doctorName,
     doctorId: appointment.doctorId,
     appointmentDate: appointment.appointmentDate,
-    appointmentTime: appointment.appointmentTimeOnly,
+    appointmentTime: appointment.appointmentTimeOnly
   }).toString();
 
   // Redirect to the update page with the query string
@@ -78,7 +78,6 @@ function redirectToUpdatePage(appointment) {
     window.location.href = `/pages/updateAppointment.html?${queryString}`;
   }, 100);
 }
-
 
 // Search and Filter Listeners
 document.getElementById("searchBar").addEventListener("input", handleFilterChange);
@@ -102,4 +101,3 @@ async function handleFilterChange() {
     alert("❌ An error occurred while filtering appointments.");
   }
 }
-

@@ -14,8 +14,7 @@
     <script src="../js/util.js" defer></script>
     <script src="../js/components/header.js" defer></script>
     <script src="../js/components/footer.js" defer></script>
-    <script type="module" src = "../js/addPrescription.js"></script>
-
+    <script type="module" src="../js/addPrescription.js"></script>
 </head>
 
 <body onload="renderContent()">
@@ -33,12 +32,10 @@
                         <input type="text" id="medicines" placeholder="e.g. Paracetamol, Vitamin C" required>
 
                         <label for="dosage">Dosage Instructions</label>
-                        <textarea id="dosage" rows="3"
-                            placeholder="e.g - Paracetamol"></textarea>
+                        <textarea id="dosage" rows="3" placeholder="e.g - Paracetamol"></textarea>
 
                         <label for="notes">Additional Notes</label>
-                        <textarea id="notes" rows="3"
-                            placeholder="Any precautions or observations (optional)"></textarea>
+                        <textarea id="notes" rows="3" placeholder="Any precautions or observations (optional)"></textarea>
 
                         <button type="submit" class="btn-primary" id="savePrescription">Add Prescription</button>
                         <button type="button" onclick="selectRole('doctor')" class="btn-secondary">Cancel</button>
@@ -49,4 +46,5 @@
         </div>
     </div>
 </body>
+
 </html>

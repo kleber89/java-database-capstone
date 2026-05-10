@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("${api.path} + doctor") // Base URL path for all methods in this controller
+@RequestMapping("${api.path}doctor") // Base URL path for all methods in this controller
 public class DoctorController {
 
     private final DoctorService doctorService; // Service for doctor-related logic

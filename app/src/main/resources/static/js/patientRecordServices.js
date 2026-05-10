@@ -18,9 +18,8 @@ async function initializePage() {
     const appointmentData = await getPatientAppointments(patientId, token, "doctor") || [];
 
     // Filter by both patientId and doctorId
-    const filteredAppointments = appointmentData.filter(app =>
-      app.doctorId == doctorId);
-    console.log(filteredAppointments)
+    const filteredAppointments = appointmentData.filter(app => app.doctorId == doctorId);
+
     renderAppointments(filteredAppointments);
   } catch (error) {
     console.error("Error loading appointments:", error);

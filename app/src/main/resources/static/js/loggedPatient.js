@@ -1,9 +1,7 @@
-// loggedPatient.js 
-import { getDoctors } from './services/doctorServices.js';
+// loggedPatient.js
+import { getDoctors, filterDoctors } from './services/doctorServices.js';
 import { createDoctorCard } from './components/doctorCard.js';
-import { filterDoctors } from './services/doctorServices.js';
 import { bookAppointment } from './services/appointmentRecordService.js';
-
 
 document.addEventListener("DOMContentLoaded", () => {
   loadDoctorCards();
@@ -28,8 +26,7 @@ function loadDoctorCards() {
 export function showBookingOverlay(e, doctor, patient) {
   const button = e.target;
   const rect = button.getBoundingClientRect();
-  console.log(patient.name)
-  console.log(patient)
+
   const ripple = document.createElement("div");
   ripple.classList.add("ripple-overlay");
   ripple.style.left = `${e.clientX}px`;
@@ -45,8 +42,8 @@ export function showBookingOverlay(e, doctor, patient) {
     <h2>Book Appointment</h2>
     <input class="input-field" type="text" value="${patient.name}" disabled />
     <input class="input-field" type="text" value="${doctor.name}" disabled />
-    <input class="input-field" type="text" value="${doctor.specialty}" disabled/>
-    <input class="input-field" type="email" value="${doctor.email}" disabled/>
+    <input class="input-field" type="text" value="${doctor.specialty}" disabled />
+    <input class="input-field" type="email" value="${doctor.email}" disabled />
     <input class="input-field" type="date" id="appointment-date" />
     <select class="input-field" id="appointment-time">
       <option value="">Select time</option>
@@ -64,13 +61,13 @@ export function showBookingOverlay(e, doctor, patient) {
     const time = modalApp.querySelector("#appointment-time").value;
     const token = localStorage.getItem("token");
     const startTime = time.split('-')[0];
+
     const appointment = {
       doctor: { id: doctor.id },
       patient: { id: patient.id },
       appointmentTime: `${date}T${startTime}:00`,
       status: 0
     };
-
 
     const { success, message } = await bookAppointment(appointment, token);
 
@@ -84,20 +81,15 @@ export function showBookingOverlay(e, doctor, patient) {
   });
 }
 
-
-
 // Filter Input
 document.getElementById("searchBar").addEventListener("input", filterDoctorsOnChange);
 document.getElementById("filterTime").addEventListener("change", filterDoctorsOnChange);
 document.getElementById("filterSpecialty").addEventListener("change", filterDoctorsOnChange);
 
-
-
 function filterDoctorsOnChange() {
   const searchBar = document.getElementById("searchBar").value.trim();
   const filterTime = document.getElementById("filterTime").value;
   const filterSpecialty = document.getElementById("filterSpecialty").value;
-
 
   const name = searchBar.length > 0 ? searchBar : null;
   const time = filterTime.length > 0 ? filterTime : null;
@@ -110,14 +102,12 @@ function filterDoctorsOnChange() {
       contentDiv.innerHTML = "";
 
       if (doctors.length > 0) {
-        console.log(doctors);
         doctors.forEach(doctor => {
           const card = createDoctorCard(doctor);
           contentDiv.appendChild(card);
         });
       } else {
         contentDiv.innerHTML = "<p>No doctors found with the given filters.</p>";
-        console.log("Nothing");
       }
     })
     .catch(error => {
@@ -134,5 +124,4 @@ export function renderDoctorCards(doctors) {
     const card = createDoctorCard(doctor);
     contentDiv.appendChild(card);
   });
-
 }

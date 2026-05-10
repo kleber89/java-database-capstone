@@ -1,9 +1,9 @@
 // index.js - Landing page logic for role selection and login handling
 
-import { API_BASE_URL } from './config.js';
+import { API_BASE_URL } from './config/config.js';
 
-// Role selection function
-function selectRoleType(role) {
+// Role selection function - exposed to global scope for onclick handlers
+window.selectRoleType = function(role) {
     // Store the selected role in localStorage
     localStorage.setItem('selectedRole', role);
 
@@ -41,10 +41,12 @@ async function adminLoginHandler(event) {
 
         if (response.ok) {
             const data = await response.json();
-            localStorage.setItem('authToken', data.token);
+            const token = data.token;
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('token', token); // Also store as 'token' for compatibility
             localStorage.setItem('userRole', 'admin');
-            // Redirect to admin dashboard
-            window.location.href = '/admin/dashboard';
+            // Redirect to admin dashboard with token
+            window.location.href = `/adminDashboard/${token}`;
         } else {
             alert('Invalid admin credentials');
         }
@@ -58,7 +60,7 @@ async function adminLoginHandler(event) {
 async function doctorLoginHandler(event) {
     event.preventDefault();
 
-    const username = document.getElementById('doctorUsername').value;
+    const identifier = document.getElementById('doctorUsername').value;
     const password = document.getElementById('doctorPassword').value;
 
     try {
@@ -67,15 +69,17 @@ async function doctorLoginHandler(event) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ identifier, password }),
         });
 
         if (response.ok) {
             const data = await response.json();
-            localStorage.setItem('authToken', data.token);
+            const token = data.token;
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('token', token); // Also store as 'token' for compatibility
             localStorage.setItem('userRole', 'doctor');
-            // Redirect to doctor dashboard
-            window.location.href = '/doctor/dashboard';
+            // Redirect to doctor dashboard with token
+            window.location.href = `/doctorDashboard/${token}`;
         } else {
             alert('Invalid doctor credentials');
         }
@@ -89,7 +93,7 @@ async function doctorLoginHandler(event) {
 async function patientLoginHandler(event) {
     event.preventDefault();
 
-    const username = document.getElementById('patientUsername').value;
+    const identifier = document.getElementById('patientUsername').value;
     const password = document.getElementById('patientPassword').value;
 
     try {
@@ -98,15 +102,17 @@ async function patientLoginHandler(event) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username, password }),
+            body: JSON.stringify({ identifier, password }),
         });
 
         if (response.ok) {
             const data = await response.json();
-            localStorage.setItem('authToken', data.token);
+            const token = data.token;
+            localStorage.setItem('authToken', token);
+            localStorage.setItem('token', token); // Also store as 'token' for compatibility
             localStorage.setItem('userRole', 'patient');
-            // Redirect to patient dashboard
-            window.location.href = '/patient/dashboard';
+            // Redirect to patient dashboard (static page)
+            window.location.href = '/pages/patientDashboard.html';
         } else {
             alert('Invalid patient credentials');
         }

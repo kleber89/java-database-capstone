@@ -18,7 +18,7 @@ public class DashboardController {
         if (isValid) {
             return "admin/adminDashboard";
         } else {
-            return "redirect:http://localhost:8080";
+            return "redirect:/";
         }
     }
 
@@ -28,7 +28,7 @@ public class DashboardController {
         if (isValid) {
             return "doctor/doctorDashboard";
         } else {
-            return "redirect:http://localhost:8080";
+            return "redirect:/";
         }
     }
 }
